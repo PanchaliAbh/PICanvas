@@ -14,7 +14,8 @@ var i2=0;
 var i=0;
 var size;
 var mp=0;
-
+var check=1;;
+var mykey;
 
 function preload() {
   font = loadFont('./font/OpenSans-Regular.otf');
@@ -46,19 +47,28 @@ function newDrawing(data){
            ellipse(data.x, data.y, 100, 100); 
         }
     }else if (data.pnumber==3) {
-        line(30, 20, 85, 75);
+        line(130, 120, 285, 275);
     }else if (data.pnumber==4) {
-        if (data.KKCC >= 'a' && data.KKCC <= 'z') {
-            skc2 += data.KKCC; 
-            print(skc2);
-            let bbox2 = font.textBounds(skc2, data.x, data.y, 30);
-            fill(255);
-            stroke(0);
-            rect(bbox2.x, bbox2.y, bbox2.w+10, bbox2.h+10);
-            fill(0);
-            textFont(font);
-            textSize(30);
-            text(skc2, data.x, data.y);
+        if(data.skkcc==0){
+           skc2="";
+        }else{
+            if (data.KKCC >= 'a' && data.KKCC <= 'z' || data.kCode==32) {
+                if (data.kCode==32) {
+                     skc2= skc2+" ";
+                }else{
+                    skc2 += data.KKCC;
+                }
+                check++;
+                print(skc2);
+                let bbox2 = font.textBounds(skc2, data.x, data.y, 30);
+                fill(255);
+                stroke(0);
+                rect(bbox2.x, bbox2.y, bbox2.w+10, bbox2.h+10);
+                fill(0);
+                textFont(font);
+                textSize(30);
+                text(skc2, data.x, data.y);
+            }
         }
     }else if (data.pnumber==5) {
         stroke(0);
@@ -121,6 +131,7 @@ function draw(number) {
         skc2="";
         keyPressed();
         skc="";
+        skc2="";
     }else if (number==5) {
         pnumber=5;
         mouseDragged();
@@ -133,9 +144,18 @@ function mousePressed() {
       x:mouseX,
       y: mouseY,
       pnumber:pnumber,
-      mp2:mp
+      mp2:mp,
+      KKCC:key,
+      kCode:keyCode,
+      skkcc:check
     }
-    
+    if (pnumber==4) {
+      skc="";
+      skc2="";
+      check=0;
+      socket.emit('mouse', data);
+    }
+   
   if (pnumber==2) {
     socket.emit('mouse', data);
     mp++;
@@ -144,40 +164,48 @@ function mousePressed() {
        ellipse(mouseX, mouseY, 100, 100); 
     } 
   }else if (pnumber==3) {
-       line(30, 20, 85, 75);
+    socket.emit('mouse', data);
+       line(130, 120, 285, 275);
   }
 }
 
 
 
 function keyPressed() {
-    console.log('sending: ' + mouseX + ',' + key);
-    var data={
-      x:mouseX,
-      y: mouseY,
-      pnumber:pnumber,
-      KKCC:key,
-      kCode:keyCode
-    }
-    
-    socket.emit('mouse', data);
-
-
     if (pnumber==4) {
-        if (pnumber==4) {
-            if (key >= 'a' && key <= 'z') {
-            skc += key; 
-            let bbox = font.textBounds(skc, mouseX, mouseY, 30);
-            fill(255);
-            stroke(0);
-            rect(bbox.x, bbox.y, bbox.w+10, bbox.h+10);
-            fill(0);
-            textFont(font);
-            textSize(30);
-            text(skc, mouseX, mouseY);
+        
+           if (key >= 'a' && key <= 'z' || keyCode==32) {
+            console.log('sending: ' + mouseX + ',' + keyCode);
+            var data={
+              x:mouseX,
+              y: mouseY,
+              pnumber:pnumber,
+              KKCC:key,
+              kCode:keyCode
+            }
+            if(keyCode!=0){
+                check=0;
+               socket.emit('mouse', data); 
+
+            }
+            mykey=keyCode;
+                if (keyCode==32) {
+                     skc= skc+" ";
+                }else{
+                    skc += key;
+                }
+                
+                let bbox = font.textBounds(skc, mouseX, mouseY, 30);
+                fill(255);
+                stroke(0);
+                rect(bbox.x, bbox.y, bbox.w+10, bbox.h+10);
+                fill(0);
+                textFont(font);
+                textSize(30);
+                text(skc, mouseX, mouseY);
 
             } 
-        }
+        
     }
 
 }
