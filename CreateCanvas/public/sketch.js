@@ -3,10 +3,17 @@ var socket;
 var pnumber;
 let font;
 var skc="";
-var xl1,yl1,wl1,hl1;
 var skc2="";
-let textString = 'Lorem ipsum dolor sit amet.';
-
+let xc = 100;
+let yc = 100;
+let xc2 = 100;
+let yc2 = 100;
+let d=33;
+let d2=33;
+var i2=0;
+var i=0;
+var size;
+var mp=0;
 
 
 function preload() {
@@ -15,37 +22,44 @@ function preload() {
 
 
 
+
+
 function setup() {
   // put setup code here
   canvas=createCanvas(windowWidth,windowHeight);
   socket=io.connect('http://localhost:4200');
   socket.on('mouse', newDrawing);
-  
 }
 
 
 function newDrawing(data){  
 
    if(data.pnumber==0){
-       clear();
+        clear();
     }else if (data.pnumber==1) {
         fill(255);
-        rect(data.x, data.y, data.px, data.py);
+        clear();
+        rect(data.x, data.y, data.px, data.py); 
     }else if (data.pnumber==2) {
-        circle(100, 100, 90);
+        if(data.mp2>=1){
+            fill(255);
+           ellipse(data.x, data.y, 100, 100); 
+        }
     }else if (data.pnumber==3) {
         line(30, 20, 85, 75);
     }else if (data.pnumber==4) {
-        skc2 += data.KKCC; 
-        print(skc2);
-        let bbox2 = font.textBounds(skc2, 10, 30, 30);
-        fill(255);
-        stroke(0);
-        rect(bbox2.x, bbox2.y, bbox2.w, bbox2.h);
-        fill(0);
-        textFont(font);
-        textSize(30);
-        text(skc2, 10, 30);
+        if (data.KKCC >= 'a' && data.KKCC <= 'z') {
+            skc2 += data.KKCC; 
+            print(skc2);
+            let bbox2 = font.textBounds(skc2, data.x, data.y, 30);
+            fill(255);
+            stroke(0);
+            rect(bbox2.x, bbox2.y, bbox2.w+10, bbox2.h+10);
+            fill(0);
+            textFont(font);
+            textSize(30);
+            text(skc2, data.x, data.y);
+        }
     }else if (data.pnumber==5) {
         stroke(0);
         line(data.x, data.y, data.px, data.py);
@@ -63,7 +77,8 @@ function mouseDragged(){
       pnumber:pnumber,
       px:pmouseX,
       py:pmouseY,
-      KKCC:key
+      i:i,
+      psize:size
     }
     
     socket.emit('mouse', data);
@@ -71,18 +86,13 @@ function mouseDragged(){
     if(pnumber==0){
         clear();
     }else if (pnumber==1) {
-        if (mouseIsPressed === true) {
-          fill(255);
-          rect(mouseX, mouseY, pmouseX, pmouseY);
-        }
-    }else if (pnumber==2) {
-        circle(100, 100, 90);
-    }else if (pnumber==3) {
-        line(30, 20, 85, 75);
+      fill(255);
+     clear();
+     rect(mouseX, mouseY, pmouseX, pmouseY); 
     }else if (pnumber==5) {
         stroke(0);
         if (mouseIsPressed === true) {
-           line(mouseX, mouseY, pmouseX, pmouseY);
+          line(mouseX, mouseY, pmouseX, pmouseY);
         }
     }
 
@@ -92,6 +102,7 @@ function mouseDragged(){
 
 function draw(number) {
   // put drawing code here   
+ 
   if(number==0){
         pnumber=0;
         mouseDragged();
@@ -100,18 +111,43 @@ function draw(number) {
         mouseDragged();
     }else if (number==2) {
         pnumber=2;
-        mouseDragged();
+        mousePressed();
     }else if (number==3) {
         pnumber=3;        
-        mouseDragged();
+        mousePressed();
     }else if (number==4) {
         pnumber=4;
+        skc="";
+        skc2="";
         keyPressed();
+        skc="";
     }else if (number==5) {
         pnumber=5;
         mouseDragged();
     }
 }  
+
+function mousePressed() {
+    console.log('sending: ' + mouseX + ',' + mp);
+    var data={
+      x:mouseX,
+      y: mouseY,
+      pnumber:pnumber,
+      mp2:mp
+    }
+    
+  if (pnumber==2) {
+    socket.emit('mouse', data);
+    mp++;
+    if(mp>1){
+        fill(255);
+       ellipse(mouseX, mouseY, 100, 100); 
+    } 
+  }else if (pnumber==3) {
+       line(30, 20, 85, 75);
+  }
+}
+
 
 
 function keyPressed() {
@@ -121,21 +157,27 @@ function keyPressed() {
       y: mouseY,
       pnumber:pnumber,
       KKCC:key,
-      xl2:xl1
+      kCode:keyCode
     }
     
     socket.emit('mouse', data);
+
+
     if (pnumber==4) {
-        if (key >= 'a' && key <= 'z') {
-        skc += key; 
-        let bbox = font.textBounds(skc, 10, 30, 30);
-        fill(255);
-        stroke(0);
-        rect(bbox.x, bbox.y, bbox.w, bbox.h);
-        fill(0);
-        textFont(font);
-        textSize(30);
-        text(skc, 10, 30);
-        } 
-    }               
+        if (pnumber==4) {
+            if (key >= 'a' && key <= 'z') {
+            skc += key; 
+            let bbox = font.textBounds(skc, mouseX, mouseY, 30);
+            fill(255);
+            stroke(0);
+            rect(bbox.x, bbox.y, bbox.w+10, bbox.h+10);
+            fill(0);
+            textFont(font);
+            textSize(30);
+            text(skc, mouseX, mouseY);
+
+            } 
+        }
+    }
+
 }
