@@ -14,8 +14,9 @@ var i2=0;
 var i=0;
 var size;
 var mp=0;
-var check=1;;
+var check=1;
 var mykey;
+var check=2;
 
 function preload() {
   font = loadFont('./font/OpenSans-Regular.otf');
@@ -139,7 +140,7 @@ function draw(number) {
 }  
 
 function mousePressed() {
-    console.log('sending: ' + mouseX + ',' + mp);
+    console.log('sending: ' + mouseX + ',' + keyCode);
     var data={
       x:mouseX,
       y: mouseY,
@@ -172,6 +173,7 @@ function mousePressed() {
 
 
 function keyPressed() {
+
     if (pnumber==4) {
         
            if (key >= 'a' && key <= 'z' || keyCode==32) {
