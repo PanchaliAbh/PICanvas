@@ -1,0 +1,27 @@
+<style>
+        body {margin:0;}
+        canvas { border-style: solid }
+        .icon-bar {
+          width: 100%;
+          background-color: #555;
+          overflow: auto;
+          display: flex;
+          justify-content: center;
+        }
+        
+        .icon-bar a {
+          float: left;
+          height: 100px;
+          width: 30%;
+          text-align: center;
+          padding: 5px 0;
+          transition: all 0.3s ease;
+          color: white;
+          font-size: 36px;
+        }
+        
+        .icon-bar a:hover {
+          background-color: #4CAF50;
+        }
+        
+</style>
